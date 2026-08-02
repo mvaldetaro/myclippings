@@ -22,9 +22,7 @@ async function runMigrations(log: FastifyBaseLogger, db: Database) {
 
   try {
     const entries = await readdir(migrationsDir);
-    const sqlFiles = entries
-      .filter((f) => f.endsWith('.sql'))
-      .sort(); // Ordem alfabética garante sequência correta (0000_, 0001_, etc.)
+    const sqlFiles = entries.filter((f) => f.endsWith('.sql')).sort(); // Ordem alfabética garante sequência correta (0000_, 0001_, etc.)
 
     for (const file of sqlFiles) {
       // Read SQL file content

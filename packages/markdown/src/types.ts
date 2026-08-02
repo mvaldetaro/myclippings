@@ -4,6 +4,8 @@ export interface MarkdownFrontMatter {
   bookId: string; // ULID
   title: string;
   author: string;
+  /** URL da capa do livro (OpenLibrary Covers API), opcional */
+  coverUrl?: string | null;
   createdAt: string; // ISO 8601 datetime
   updatedAt: string; // ISO 8601 datetime
   clippingCount: number;

@@ -67,10 +67,7 @@ async function importMigrationSQL(): Promise<string[]> {
   const { join } = await import('node:path');
   const { readdir } = await import('node:fs/promises');
 
-  const migrationsDir = join(
-    import.meta.dirname,
-    '../../../packages/database/migrations',
-  );
+  const migrationsDir = join(import.meta.dirname, '../../../packages/database/migrations');
 
   const entries = await readdir(migrationsDir);
   const sqlFiles = entries.filter((f) => f.endsWith('.sql')).sort();

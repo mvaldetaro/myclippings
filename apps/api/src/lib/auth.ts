@@ -13,10 +13,7 @@ import { UnauthorizedError } from './errors';
  *   // ou em rotas específicas:
  *   app.get('/protected', { onRequest: [authenticate] }, handler);
  */
-export async function authenticate(
-  request: FastifyRequest,
-  _reply: FastifyReply,
-): Promise<void> {
+export async function authenticate(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
   try {
     await request.jwtVerify();
   } catch {

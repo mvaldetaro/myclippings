@@ -32,7 +32,8 @@ describe('Clippings Routes', () => {
 
     // Importa um arquivo
     const boundary = '---testboundary';
-    const fileContent = 'Quote Book (Quote Author)\n- Seu destaque na posição 135-138 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nNot all those who wander are lost.\n==========\n';
+    const fileContent =
+      'Quote Book (Quote Author)\n- Seu destaque na posição 135-138 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nNot all those who wander are lost.\n==========\n';
     const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent}\r\n--${boundary}--`;
 
     const importRes = await app.inject({
@@ -154,7 +155,8 @@ Something completely different.
     const { token } = await registerAndLogin(app);
 
     const boundary = '---testboundary';
-    const fileContent = 'Single Book (Single Author)\n- Seu destaque na posição 10-12 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nA specific clipping.\n==========\n';
+    const fileContent =
+      'Single Book (Single Author)\n- Seu destaque na posição 10-12 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nA specific clipping.\n==========\n';
     const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent}\r\n--${boundary}--`;
 
     const importRes = await app.inject({
@@ -199,7 +201,8 @@ Something completely different.
     });
 
     const boundary = '---testboundary';
-    const fileContent = 'Shared Book (Shared Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent.\n==========\n';
+    const fileContent =
+      'Shared Book (Shared Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent.\n==========\n';
     const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent}\r\n--${boundary}--`;
 
     const importRes = await app.inject({

@@ -45,7 +45,8 @@ describe('Books Routes', () => {
 
     // Importa um arquivo primeiro
     const boundary = '---testboundary';
-    const fileContent = 'Book Title (Author Name)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent.\n==========\n';
+    const fileContent =
+      'Book Title (Author Name)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent.\n==========\n';
     const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent}\r\n--${boundary}--`;
 
     await app.inject({
@@ -79,7 +80,8 @@ describe('Books Routes', () => {
 
     // Importa dois livros
     const boundary1 = '---b1';
-    const f1 = 'Alpha Book (First Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nA.\n==========\n';
+    const f1 =
+      'Alpha Book (First Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nA.\n==========\n';
     const b1 = `--${boundary1}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${f1}\r\n--${boundary1}--`;
 
     await app.inject({
@@ -91,7 +93,8 @@ describe('Books Routes', () => {
     });
 
     const boundary2 = '---b2';
-    const f2 = 'Beta Book (Second Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 22:00:00\n\nB.\n==========\n';
+    const f2 =
+      'Beta Book (Second Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 22:00:00\n\nB.\n==========\n';
     const b2 = `--${boundary2}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings 2.txt"\r\nContent-Type: text/plain\r\n\r\n${f2}\r\n--${boundary2}--`;
 
     await app.inject({
@@ -124,7 +127,8 @@ describe('Books Routes', () => {
 
     // Importa
     const boundary = '---testboundary';
-    const fileContent = 'Download Book (DL Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent for download.\n==========\n';
+    const fileContent =
+      'Download Book (DL Author)\n- Seu destaque na posição 1-2 | Adicionado: Sexta-feira, 20 de julho de 2026 21:30:00\n\nContent for download.\n==========\n';
     const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent}\r\n--${boundary}--`;
 
     const importRes = await app.inject({

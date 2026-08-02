@@ -44,9 +44,12 @@ export async function waitForLoad(page: Page): Promise<void> {
   // Aguarda spinners sumirem se houver
   const spinner = page.locator('.animate-spin');
   if ((await spinner.count()) > 0) {
-    await spinner.first().waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {
-      // Spinner pode nunca aparecer — ok
-    });
+    await spinner
+      .first()
+      .waitFor({ state: 'hidden', timeout: 15000 })
+      .catch(() => {
+        // Spinner pode nunca aparecer — ok
+      });
   }
 }
 
@@ -93,11 +96,7 @@ export async function registerUser(
  *  3. Submete o formulário
  *  4. Aguarda redirecionamento para /books
  */
-export async function loginUser(
-  page: Page,
-  email: string,
-  password: string,
-): Promise<void> {
+export async function loginUser(page: Page, email: string, password: string): Promise<void> {
   await page.goto('/login');
   await waitForLoad(page);
 
@@ -122,10 +121,7 @@ export async function loginUser(
  * O componente ImportPage renderiza um input file hidden dentro de um label.
  * Playwright consegue interagir com inputs hidden via setInputFiles.
  */
-export async function uploadClippings(
-  page: Page,
-  filePath: string,
-): Promise<void> {
+export async function uploadClippings(page: Page, filePath: string): Promise<void> {
   await page.goto('/import');
   await waitForLoad(page);
 

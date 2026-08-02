@@ -82,13 +82,21 @@ export const quoteRoutes: FastifyPluginAsync = async (app) => {
 
     return {
       backgroundColor:
-        typeof stored.backgroundColor === 'string' ? stored.backgroundColor : DEFAULT_QUOTE_PREFERENCES.backgroundColor,
+        typeof stored.backgroundColor === 'string'
+          ? stored.backgroundColor
+          : DEFAULT_QUOTE_PREFERENCES.backgroundColor,
       textColor:
-        typeof stored.textColor === 'string' ? stored.textColor : DEFAULT_QUOTE_PREFERENCES.textColor,
+        typeof stored.textColor === 'string'
+          ? stored.textColor
+          : DEFAULT_QUOTE_PREFERENCES.textColor,
       showAuthor:
-        typeof stored.showAuthor === 'boolean' ? stored.showAuthor : DEFAULT_QUOTE_PREFERENCES.showAuthor,
+        typeof stored.showAuthor === 'boolean'
+          ? stored.showAuthor
+          : DEFAULT_QUOTE_PREFERENCES.showAuthor,
       showBookTitle:
-        typeof stored.showBookTitle === 'boolean' ? stored.showBookTitle : DEFAULT_QUOTE_PREFERENCES.showBookTitle,
+        typeof stored.showBookTitle === 'boolean'
+          ? stored.showBookTitle
+          : DEFAULT_QUOTE_PREFERENCES.showBookTitle,
     };
   }
 

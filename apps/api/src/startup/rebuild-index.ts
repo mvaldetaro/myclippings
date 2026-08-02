@@ -23,10 +23,7 @@ export interface RebuildResult {
  * O índice é completamente reconstruível — o conteúdo dos clippings
  * nunca é armazenado no banco (ARCHITECTURE §10.1).
  */
-export async function rebuildIndex(
-  log: FastifyBaseLogger,
-  db: Database,
-): Promise<RebuildResult> {
+export async function rebuildIndex(log: FastifyBaseLogger, db: Database): Promise<RebuildResult> {
   const userFilesDir = env.USER_FILES_DIR;
   const result: RebuildResult = { indexed: 0, skipped: 0, errors: 0 };
 
@@ -64,10 +61,7 @@ export async function rebuildIndex(
               .select()
               .from(schema.fileIndex)
               .where(
-                and(
-                  eq(schema.fileIndex.userId, userId),
-                  eq(schema.fileIndex.bookId, fm.bookId),
-                ),
+                and(eq(schema.fileIndex.userId, userId), eq(schema.fileIndex.bookId, fm.bookId)),
               )
               .get();
 

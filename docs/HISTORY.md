@@ -1,5 +1,58 @@
 # Histórico de Implementação
 
+## Integração OpenLibrary Covers API — 02/08/2026
+
+### Objetivo
+
+Integrar a API do OpenLibrary para buscar e exibir capas de livros automaticamente durante a importação e nas páginas de listagem e detalhes.
+
+### Arquivos Criados/Modificados
+
+**Novo módulo:**
+- `apps/api/src/lib/openlibrary.ts` — Cliente da OpenLibrary API com `fetchBookCover(title, author)` e `buildCoverUrl(coverId, size)`. Busca best-effort que não bloqueia a importação em caso de falha.
+
+**Data model (domain + schemas + markdown):**
+- `packages/domain/src/book.ts` — Adicionado `coverUrl?: string | null` a `Book` e `CreateBookInput`
+- `packages/schemas/src/book.ts` — Adicionado `coverUrl: z.string().url().nullable().optional()` ao `BookSchema`
+- `packages/markdown/src/types.ts` — Adicionado `coverUrl?: string | null` ao `MarkdownFrontMatter`
+- `packages/markdown/src/serializer.ts` — Adicionado `coverUrl?` a `SerializeBookParams` e incluído condicionalmente no YAML do front matter
+
+**Banco de dados:**
+- `packages/database/src/schema/index.ts` — Adicionada coluna `cover_url: text` à tabela `file_index`
+- `packages/database/migrations/0003_smooth_mindworm.sql` — Migration: `ALTER TABLE file_index ADD cover_url text`
+
+**API handlers:**
+- `apps/api/src/modules/books/list-books.ts` — Inclui `coverUrl` do `file_index` na resposta da listagem
+- `apps/api/src/modules/books/get-book.ts` — Inclui `coverUrl` do front matter (com fallback para `file_index.cover_url`) na resposta de detalhes
+- `apps/api/src/modules/imports/import-handler.ts` — Busca capa via `fetchBookCover()` durante importação (apenas se livro não possui capa existente); armazena no Markdown e no `file_index`
+
+**Frontend:**
+- `apps/web/src/queries/books.ts` — Adicionado `coverUrl?: string | null` a `BookListItem` e `BookWithClippingsResponse`
+- `apps/web/src/routes/books/index.tsx` (`BookCard`) — Capa em thumbnail (64x96px) com fallback de ícone `BookOpen` quando ausente
+- `apps/web/src/routes/books/$bookId.tsx` (`BookDetailPage`) — Capa em tamanho maior (112x160px) no header, visível apenas em telas sm+
+
+**Documentação:**
+- `docs/ARCHITECTURE.md` — Seção 16.1 documentando a integração OpenLibrary
+- `docs/SPEC.md` — Atualizado exemplo de front matter com `coverUrl`
+
+**Testes:**
+- `packages/domain/src/__tests__/book.test.ts` — Atualizado teste do `CreateBookInput` para incluir `coverUrl` opcional
+
+### Validação
+
+- `pnpm typecheck`: ✅ Todos os pacotes passam (erros em `quotes/$bookId.$clipId.tsx` e `settings.tsx` são pré-existentes)
+- `pnpm test`: ✅ 35 (domain) + 78 (markdown) + 22 (kindle-parser) = 135 testes passam (quote-generator falha pré-existente por versão do canvas)
+- `pnpm lint`: ✅ Apenas 2 warnings pré-existentes (`noImplicitAnyLet`, `noNonNullAssertion`)
+
+### Decisões
+
+- **Capa é opcional**: Livros sem capa funcionam normalmente, exibindo um placeholder
+- **Best-effort na importação**: Se a API do OpenLibrary falhar, a importação prossegue sem capa
+- **Não sobrescreve capas existentes**: A busca é feita apenas quando `coverUrl` está ausente
+- **URL armazenada, não o binário**: A URL da capa no OpenLibrary é armazenada; a imagem é carregada diretamente pelo navegador
+
+---
+
 ## Fase 3: API HTTP (Fastify) — 27/07/2026
 
 ### Objetivo

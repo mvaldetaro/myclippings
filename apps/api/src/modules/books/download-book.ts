@@ -58,10 +58,7 @@ export async function downloadBookHandler(
 
   // Define headers para download
   reply.header('Content-Type', 'text/markdown; charset=utf-8');
-  reply.header(
-    'Content-Disposition',
-    `attachment; filename="${indexRow.title}.md"`,
-  );
+  reply.header('Content-Disposition', `attachment; filename="${indexRow.title}.md"`);
 
   return reply.send(content);
 }

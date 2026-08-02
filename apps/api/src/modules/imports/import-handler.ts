@@ -1,26 +1,27 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import { createHash } from 'node:crypto';
-import { ulid } from 'ulid';
-import { eq, and } from 'drizzle-orm';
 import { schema } from '@my-clippings/database';
+import { createBookIdentity, normalizeBookIdentity } from '@my-clippings/domain';
+import type { ImportResult } from '@my-clippings/domain';
 import { parseClippingsFile, toRawClipping } from '@my-clippings/kindle-parser';
 import {
   buildBookPath,
-  deserializeBook,
-  serializeBook,
   computeFingerprint,
-  readMarkdownFile,
-  writeMarkdownFile,
-  fileExists,
+  deserializeBook,
   ensureDirectory,
+  fileExists,
   lockManager,
+  readMarkdownFile,
+  serializeBook,
+  writeMarkdownFile,
 } from '@my-clippings/markdown';
 import type { MarkdownClipping } from '@my-clippings/markdown';
-import { createBookIdentity, normalizeBookIdentity } from '@my-clippings/domain';
-import type { ImportResult } from '@my-clippings/domain';
-import { getDb } from '../../lib/db';
+import { and, eq } from 'drizzle-orm';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { ulid } from 'ulid';
 import { env } from '../../config/env';
-import { ValidationError, InternalError } from '../../lib/errors';
+import { getDb } from '../../lib/db';
+import { InternalError, ValidationError } from '../../lib/errors';
+import { fetchBookCover } from '../../lib/openlibrary';
 
 /** Grupo de clippings pertencentes ao mesmo livro (identidade normalizada) */
 interface BookGroup {
@@ -47,9 +48,10 @@ interface BookGroup {
  *
  * Destaques e marcadores não são afetados — o bug só ocorre com notas.
  */
-function deduplicateNoteFragments(
-  records: ReturnType<typeof toRawClipping>[],
-): { records: ReturnType<typeof toRawClipping>[]; removedCount: number } {
+function deduplicateNoteFragments(records: ReturnType<typeof toRawClipping>[]): {
+  records: ReturnType<typeof toRawClipping>[];
+  removedCount: number;
+} {
   // Separa notas dos demais tipos (destaques e marcadores não são afetados)
   const notes = records.filter((r) => r.type === 'nota');
   const nonNotes = records.filter((r) => r.type !== 'nota');
@@ -73,9 +75,7 @@ function deduplicateNoteFragments(
   let removedCount = 0;
   const deduped: ReturnType<typeof toRawClipping>[] = [];
   for (const group of groups.values()) {
-    group.sort(
-      (a, b) => new Date(b.kindleDate).getTime() - new Date(a.kindleDate).getTime(),
-    );
+    group.sort((a, b) => new Date(b.kindleDate).getTime() - new Date(a.kindleDate).getTime());
     deduped.push(group[0]!);
     removedCount += group.length - 1;
   }
@@ -105,10 +105,7 @@ function deduplicateNoteFragments(
  * Em qualquer erro, o registro de importação é marcado como 'failed' e o erro
  * é relançado para o middleware centralizado de erros.
  */
-export async function importHandler(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function importHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   // ── 1. Valida e lê o arquivo multipart ──────────────────────────────────────
   if (!request.isMultipart()) {
     throw new ValidationError('Requisição deve ser multipart/form-data com um arquivo');
@@ -208,6 +205,7 @@ export async function importHandler(
       let existingClippings: MarkdownClipping[] = [];
       let createdAt = new Date().toISOString();
       let schemaVersion = 1;
+      let existingCoverUrl: string | null = null;
 
       const exists = await fileExists(filePath);
       if (exists) {
@@ -217,6 +215,7 @@ export async function importHandler(
           existingClippings = deserialized.clippings;
           createdAt = deserialized.frontMatter.createdAt;
           schemaVersion = deserialized.frontMatter.schemaVersion;
+          existingCoverUrl = deserialized.frontMatter.coverUrl ?? null;
         } catch (error) {
           const reason = error instanceof Error ? error.message : String(error);
           throw new InternalError(
@@ -277,10 +276,21 @@ export async function importHandler(
         const combined = [...existingClippings, ...newClippings];
         const updatedAt = new Date().toISOString();
 
+        // Busca capa do OpenLibrary (best-effort) — apenas se não houver capa existente
+        let coverUrl = existingCoverUrl;
+        if (!coverUrl) {
+          try {
+            coverUrl = await fetchBookCover(group.title, group.author);
+          } catch {
+            // Ignora erros de rede/parse — capa é opcional
+          }
+        }
+
         const serialized = serializeBook({
           bookId,
           title: group.title,
           author: group.author,
+          coverUrl,
           createdAt,
           updatedAt,
           schemaVersion,
@@ -308,6 +318,7 @@ export async function importHandler(
               relativePath,
               title: group.title,
               author: group.author,
+              coverUrl,
               clippingCount: serialized.clippingCount,
               fileModifiedAt: now,
               indexedAt: now,
@@ -320,6 +331,7 @@ export async function importHandler(
             relativePath,
             title: group.title,
             author: group.author,
+            coverUrl,
             clippingCount: serialized.clippingCount,
             fileHash: null,
             fileModifiedAt: now,

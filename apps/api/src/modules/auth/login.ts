@@ -22,10 +22,7 @@ type LoginBody = z.infer<typeof LoginBody>;
  * 3. Verifica a senha com Argon2id
  * 4. Emite JWT e configura cookie httpOnly
  */
-export async function loginHandler(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function loginHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const parsed = LoginBody.safeParse(request.body);
   if (!parsed.success) {
     throw new ValidationError(parsed.error.errors[0]?.message ?? 'Dados inválidos');
@@ -35,11 +32,7 @@ export async function loginHandler(
   const db = getDb();
 
   // Busca usuário
-  const user = await db
-    .select()
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .get();
+  const user = await db.select().from(schema.users).where(eq(schema.users.email, email)).get();
 
   if (!user) {
     throw new UnauthorizedError('E-mail ou senha inválidos');

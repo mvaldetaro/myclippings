@@ -125,29 +125,45 @@ function BookCard({ book, onClick }: { book: BookListItem; onClick: () => void }
       tabIndex={0}
       aria-label={`${book.title} de ${book.author}`}
     >
-      <div className="flex flex-col h-full">
-        {/* Título */}
-        <h2 className="headline-md text-on-surface mb-1 line-clamp-2">{book.title}</h2>
-
-        {/* Autor */}
-        <p className="body-md text-muted mb-4">{book.author}</p>
-
-        {/* Chips de tipo */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {clippingTypes.map((type) => (
-            <Chip key={type} label={clippingTypeLabel(type)} />
-          ))}
-        </div>
-
-        {/* Metadados e ação */}
-        <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col gap-0.5">
-            <span className="body-sm text-muted">
-              {book.clippingCount} {book.clippingCount === 1 ? 'clipping' : 'clippings'}
-            </span>
-            <span className="body-sm text-muted">{formatDate(book.updatedAt)}</span>
+      <div className="flex gap-4">
+        {/* Capa do livro */}
+        {book.coverUrl ? (
+          <img
+            src={book.coverUrl}
+            alt={`Capa de ${book.title}`}
+            className="w-16 h-24 object-cover rounded-sm flex-shrink-0 bg-neutral/30"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-16 h-24 flex-shrink-0 rounded-sm bg-neutral/20 flex items-center justify-center">
+            <BookOpen className="h-8 w-8 text-muted/50" />
           </div>
-          <ChevronRight className="h-5 w-5 text-muted" />
+        )}
+
+        <div className="flex flex-col flex-1 min-w-0">
+          {/* Título */}
+          <h2 className="headline-md text-on-surface mb-1 line-clamp-2">{book.title}</h2>
+
+          {/* Autor */}
+          <p className="body-md text-muted mb-4">{book.author}</p>
+
+          {/* Chips de tipo */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {clippingTypes.map((type) => (
+              <Chip key={type} label={clippingTypeLabel(type)} />
+            ))}
+          </div>
+
+          {/* Metadados e ação */}
+          <div className="mt-auto flex items-center justify-between">
+            <div className="flex flex-col gap-0.5">
+              <span className="body-sm text-muted">
+                {book.clippingCount} {book.clippingCount === 1 ? 'clipping' : 'clippings'}
+              </span>
+              <span className="body-sm text-muted">{formatDate(book.updatedAt)}</span>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted" />
+          </div>
         </div>
       </div>
     </Card>

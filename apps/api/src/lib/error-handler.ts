@@ -78,10 +78,7 @@ export function errorHandler(
  * O header de resposta é definido no hook onSend separado pois reply.header()
  * não é suportado no estágio onRequest do lifecycle do Fastify.
  */
-export async function correlationIdHook(
-  request: FastifyRequest,
-  _reply: FastifyReply,
-) {
+export async function correlationIdHook(request: FastifyRequest, _reply: FastifyReply) {
   const correlationId =
     (request.headers['x-correlation-id'] as string) ||
     `req-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;

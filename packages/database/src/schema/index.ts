@@ -90,6 +90,7 @@ export const fileIndex = sqliteTable('file_index', {
   relativePath: text('relative_path').notNull(),
   title: text('title').notNull(),
   author: text('author').notNull(),
+  coverUrl: text('cover_url'),
   clippingCount: integer('clipping_count').notNull().default(0),
   fileHash: text('file_hash'),
   fileModifiedAt: text('file_modified_at'),

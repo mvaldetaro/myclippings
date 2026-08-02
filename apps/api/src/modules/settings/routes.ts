@@ -65,7 +65,9 @@ async function getUserSettings(userId: string): Promise<UserSettings> {
       fontSize: typeof ifacePrefs.fontSize === 'number' ? ifacePrefs.fontSize : 1,
       theme:
         typeof ifacePrefs.theme === 'string' &&
-        (ifacePrefs.theme === 'light' || ifacePrefs.theme === 'dark' || ifacePrefs.theme === 'system')
+        (ifacePrefs.theme === 'light' ||
+          ifacePrefs.theme === 'dark' ||
+          ifacePrefs.theme === 'system')
           ? ifacePrefs.theme
           : 'system',
     },
@@ -116,9 +118,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     const parsed = UpdateSettingsInputSchema.safeParse(request.body);
 
     if (!parsed.success) {
-      throw new ValidationError(
-        parsed.error.errors[0]?.message ?? 'Dados inválidos',
-      );
+      throw new ValidationError(parsed.error.errors[0]?.message ?? 'Dados inválidos');
     }
 
     const input = parsed.data;
@@ -129,26 +129,16 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     // Faz merge das preferências parciais com as existentes
     const mergedQuotePrefs: QuotePreferences = {
       backgroundColor:
-        input.quotePreferences?.backgroundColor ??
-        existing.quotePreferences.backgroundColor,
-      textColor:
-        input.quotePreferences?.textColor ??
-        existing.quotePreferences.textColor,
-      showAuthor:
-        input.quotePreferences?.showAuthor ??
-        existing.quotePreferences.showAuthor,
+        input.quotePreferences?.backgroundColor ?? existing.quotePreferences.backgroundColor,
+      textColor: input.quotePreferences?.textColor ?? existing.quotePreferences.textColor,
+      showAuthor: input.quotePreferences?.showAuthor ?? existing.quotePreferences.showAuthor,
       showBookTitle:
-        input.quotePreferences?.showBookTitle ??
-        existing.quotePreferences.showBookTitle,
+        input.quotePreferences?.showBookTitle ?? existing.quotePreferences.showBookTitle,
     };
 
     const mergedIfacePrefs = {
-      fontSize:
-        input.interfacePreferences?.fontSize ??
-        existing.interfacePreferences.fontSize,
-      theme:
-        input.interfacePreferences?.theme ??
-        existing.interfacePreferences.theme,
+      fontSize: input.interfacePreferences?.fontSize ?? existing.interfacePreferences.fontSize,
+      theme: input.interfacePreferences?.theme ?? existing.interfacePreferences.theme,
     };
 
     await db

@@ -1,6 +1,6 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
-import { and, eq, like, or } from 'drizzle-orm';
 import { schema } from '@my-clippings/database';
+import { and, eq, like, or } from 'drizzle-orm';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { getDb } from '../../lib/db';
 
 /**
@@ -27,10 +27,7 @@ export async function listBooksHandler(
     const pattern = `%${search.trim()}%`;
     whereClause = and(
       eq(schema.fileIndex.userId, userId),
-      or(
-        like(schema.fileIndex.title, pattern),
-        like(schema.fileIndex.author, pattern),
-      ),
+      or(like(schema.fileIndex.title, pattern), like(schema.fileIndex.author, pattern)),
     );
   } else {
     whereClause = eq(schema.fileIndex.userId, userId);
@@ -41,6 +38,7 @@ export async function listBooksHandler(
       id: schema.fileIndex.bookId,
       title: schema.fileIndex.title,
       author: schema.fileIndex.author,
+      coverUrl: schema.fileIndex.coverUrl,
       clippingCount: schema.fileIndex.clippingCount,
       updatedAt: schema.fileIndex.indexedAt,
       schemaVersion: schema.fileIndex.indexedAt, // placeholder — file_index não armazena schemaVersion
@@ -54,6 +52,7 @@ export async function listBooksHandler(
     id: row.id,
     title: row.title,
     author: row.author,
+    coverUrl: row.coverUrl ?? null,
     clippingCount: row.clippingCount,
     updatedAt: row.updatedAt,
     schemaVersion: 1,

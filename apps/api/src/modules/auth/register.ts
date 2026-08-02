@@ -23,10 +23,7 @@ type RegisterBody = z.infer<typeof RegisterBody>;
  * 3. Gera hash Argon2id da senha
  * 4. Insere no banco e retorna o usuário criado (sem passwordHash)
  */
-export async function registerHandler(
-  request: FastifyRequest,
-  reply: FastifyReply,
-): Promise<void> {
+export async function registerHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const parsed = RegisterBody.safeParse(request.body);
   if (!parsed.success) {
     throw new ValidationError(parsed.error.errors[0]?.message ?? 'Dados inválidos');

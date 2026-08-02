@@ -1,9 +1,9 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
-import { and, eq } from 'drizzle-orm';
 import { schema } from '@my-clippings/database';
-import { deserializeBook, readMarkdownFile, buildBookPath } from '@my-clippings/markdown';
-import { getDb } from '../../lib/db';
+import { buildBookPath, deserializeBook, readMarkdownFile } from '@my-clippings/markdown';
+import { and, eq } from 'drizzle-orm';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { env } from '../../config/env';
+import { getDb } from '../../lib/db';
 import { ForbiddenError, NotFoundError } from '../../lib/errors';
 
 /**
@@ -62,6 +62,7 @@ export async function getBookHandler(
       id: frontMatter.bookId,
       title: frontMatter.title,
       author: frontMatter.author,
+      coverUrl: frontMatter.coverUrl ?? indexRow.coverUrl ?? null,
       createdAt: frontMatter.createdAt,
       updatedAt: frontMatter.updatedAt,
       clippingCount: frontMatter.clippingCount,

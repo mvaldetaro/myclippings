@@ -232,6 +232,7 @@ schemaVersion: 1
 bookId: "01J3MYCLIPPINGS001"
 title: "Nome do livro"
 author: "Nome do autor"
+coverUrl: "https://covers.openlibrary.org/b/id/12345678-M.jpg"
 createdAt: "2026-07-25T10:00:00-03:00"
 updatedAt: "2026-07-25T10:30:00-03:00"
 clippingCount: 2

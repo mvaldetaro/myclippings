@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   ArrowUpDown,
+  BookOpen,
   Copy,
   CopyCheck,
   Download,
@@ -144,40 +145,55 @@ function BookDetailPage() {
           ← Voltar para livros
         </a>
 
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mt-2">
-          <div>
-            <h1 className="headline-display text-text">{book.title}</h1>
-            <p className="headline-sm text-muted mt-1">{book.author}</p>
-            <p className="body-sm text-muted mt-2">
-              {book.clippingCount} {book.clippingCount === 1 ? 'clipping' : 'clippings'}
-            </p>
-          </div>
+        <div className="flex gap-6 mt-2">
+          {/* Capa do livro */}
+          {book.coverUrl ? (
+            <img
+              src={book.coverUrl}
+              alt={`Capa de ${book.title}`}
+              className="w-28 h-40 object-cover rounded-sm flex-shrink-0 bg-neutral/30 hidden sm:block"
+            />
+          ) : (
+            <div className="w-28 h-40 flex-shrink-0 rounded-sm bg-neutral/20 hidden sm:flex items-center justify-center">
+              <BookOpen className="h-10 w-10 text-muted/40" />
+            </div>
+          )}
 
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={copyAllClippings}
-              disabled={clippings.length === 0}
-            >
-              {copiedAll ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copiedAll ? 'Copiado!' : 'Copiar todos'}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setShowMarkdownPreview(true);
-                refetchMarkdown();
-              }}
-            >
-              <Eye className="h-4 w-4" />
-              Visualizar Markdown
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => download(bookId, book.title)}>
-              <Download className="h-4 w-4" />
-              Baixar Markdown
-            </Button>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 flex-1">
+            <div>
+              <h1 className="headline-display text-text">{book.title}</h1>
+              <p className="headline-sm text-muted mt-1">{book.author}</p>
+              <p className="body-sm text-muted mt-2">
+                {book.clippingCount} {book.clippingCount === 1 ? 'clipping' : 'clippings'}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={copyAllClippings}
+                disabled={clippings.length === 0}
+              >
+                {copiedAll ? <CopyCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copiedAll ? 'Copiado!' : 'Copiar todos'}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setShowMarkdownPreview(true);
+                  refetchMarkdown();
+                }}
+              >
+                <Eye className="h-4 w-4" />
+                Visualizar Markdown
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => download(bookId, book.title)}>
+                <Download className="h-4 w-4" />
+                Baixar Markdown
+              </Button>
+            </div>
           </div>
         </div>
       </div>

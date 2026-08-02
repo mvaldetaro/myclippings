@@ -10,6 +10,8 @@ export interface Book {
   titleSlug: string;
   /** Slug do autor para caminhos no sistema de arquivos */
   authorSlug: string;
+  /** URL da capa do livro (OpenLibrary Covers API), opcional */
+  coverUrl?: string | null;
   /** Quantidade de clippings */
   clippingCount: number;
   /** Data de criação do arquivo Markdown (ISO 8601) */
@@ -34,6 +36,8 @@ export interface CreateBookInput {
   title: string;
   /** Autor do livro */
   author: string;
+  /** URL da capa do livro (OpenLibrary), opcional */
+  coverUrl?: string | null;
 }
 
 /**

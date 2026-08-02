@@ -17,6 +17,7 @@ interface SerializeBookParams {
   bookId: string;
   title: string;
   author: string;
+  coverUrl?: string | null;
   createdAt: string;
   updatedAt: string;
   /** Versão do schema do Markdown (default: 1) */
@@ -95,18 +96,22 @@ export function serializeBook(params: SerializeBookParams): SerializedBook {
   // Cópia ordenada por data ascendente (sort estável preserva ordem em empates)
   const sorted = [...params.clippings].sort((a, b) => a.kindleDate.localeCompare(b.kindleDate));
 
-  const frontMatter = stringify(
-    {
-      schemaVersion,
-      bookId: params.bookId,
-      title: params.title,
-      author: params.author,
-      createdAt: params.createdAt,
-      updatedAt: params.updatedAt,
-      clippingCount: sorted.length,
-    },
-    YAML_OPTIONS,
-  );
+  const frontMatterData: Record<string, unknown> = {
+    schemaVersion,
+    bookId: params.bookId,
+    title: params.title,
+    author: params.author,
+    createdAt: params.createdAt,
+    updatedAt: params.updatedAt,
+    clippingCount: sorted.length,
+  };
+
+  // Inclui coverUrl no front matter apenas quando presente
+  if (params.coverUrl) {
+    frontMatterData.coverUrl = params.coverUrl;
+  }
+
+  const frontMatter = stringify(frontMatterData, YAML_OPTIONS);
 
   const lines: string[] = [
     '---',

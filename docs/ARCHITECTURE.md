@@ -952,7 +952,28 @@ Como SQLite e arquivos Markdown são armazenamentos separados, o procedimento op
 
 ## 16. External Integrations
 
-A versão inicial não depende de integrações externas para obter clippings.
+### 16.1 OpenLibrary Covers API
+
+O sistema integra com a **OpenLibrary Covers API** para enriquecer livros com capas automaticamente durante a importação.
+
+- **Endpoint de busca**: `https://openlibrary.org/search.json?q={title}+{author}&limit=1`
+- **URL da capa**: `https://covers.openlibrary.org/b/id/{coverId}-M.jpg`
+- **Tamanho padrão**: Medium (M) — adequado para exibição em lista e página de detalhes
+- **Comportamento**: Best-effort — falhas de rede ou ausência de resultados não bloqueiam a importação
+- **Cache**: A capa é armazenada como URL no front matter do Markdown e na tabela `file_index` do SQLite
+- **Idempotência**: A busca é feita apenas quando o livro não possui capa existente (não sobrescreve capas já definidas)
+
+**Fluxo de enriquecimento:**
+
+```
+Import handler → processa livro → (sem capa?) → fetchBookCover(title, author) → armazena coverUrl
+                                                                                     ├── Markdown (front matter)
+                                                                                     └── file_index.cover_url
+```
+
+**Módulo responsável**: `apps/api/src/lib/openlibrary.ts`
+
+A versão inicial não depende de outras integrações externas para obter clippings.
 
 Fora do escopo:
 

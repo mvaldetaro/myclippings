@@ -13,6 +13,8 @@ export const BookSchema = z.object({
   titleSlug: z.string(),
   /** Slug do autor para caminhos no sistema de arquivos */
   authorSlug: z.string(),
+  /** URL da capa do livro (OpenLibrary Covers API), opcional */
+  coverUrl: z.string().url().nullable().optional(),
   /** Quantidade de clippings */
   clippingCount: z.number().int().nonnegative(),
   /** Data de criação do arquivo Markdown */

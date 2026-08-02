@@ -77,7 +77,11 @@ describe('tipos de Book', () => {
     expectTypeOf<BookIdentity>().toEqualTypeOf<{ title: string; author: string }>();
   });
 
-  it('CreateBookInput deve ter apenas title e author', () => {
-    expectTypeOf<CreateBookInput>().toEqualTypeOf<{ title: string; author: string }>();
+  it('CreateBookInput deve ter apenas title, author e coverUrl opcional', () => {
+    expectTypeOf<CreateBookInput>().toEqualTypeOf<{
+      title: string;
+      author: string;
+      coverUrl?: string | null;
+    }>();
   });
 });

@@ -1,0 +1,1 @@
+ALTER TABLE `file_index` ADD `cover_url` text;

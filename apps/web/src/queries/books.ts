@@ -6,6 +6,8 @@ export interface BookListItem {
   id: string;
   title: string;
   author: string;
+  /** URL da capa do livro (OpenLibrary), opcional */
+  coverUrl?: string | null;
   clippingCount: number;
   updatedAt: string;
   schemaVersion: number;
@@ -17,6 +19,7 @@ export interface BookWithClippingsResponse {
     id: string;
     title: string;
     author: string;
+    coverUrl?: string | null;
     createdAt: string;
     updatedAt: string;
     clippingCount: number;

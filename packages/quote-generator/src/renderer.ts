@@ -81,11 +81,7 @@ const MARGIN_PX = Math.round(CANVAS_SIZE * MARGIN_RATIO);
  * @param maxWidth - Largura máxima da linha em px
  * @returns Array de linhas
  */
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string[] {
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const paragraphs = text.split('\n');
   const lines: string[] = [];
 
@@ -198,10 +194,7 @@ function truncateText(
   if (lastLine !== undefined) {
     // Adiciona "…" ao final, garantindo que caiba na largura
     const ellipsis = '\u2026';
-    while (
-      ctx.measureText(lastLine + ellipsis).width > maxWidth &&
-      lastLine.length > 0
-    ) {
+    while (ctx.measureText(lastLine + ellipsis).width > maxWidth && lastLine.length > 0) {
       truncated[lastIdx] = lastLine.slice(0, -1);
     }
     truncated[lastIdx] = `${truncated[lastIdx]}${ellipsis}`;
@@ -246,10 +239,7 @@ function buildAttribution(
   // Trunca se a atribuição for muito longa para caber na largura
   if (ctx.measureText(attribution).width > maxWidth) {
     const ellipsis = '\u2026';
-    while (
-      ctx.measureText(attribution + ellipsis).width > maxWidth &&
-      attribution.length > 0
-    ) {
+    while (ctx.measureText(attribution + ellipsis).width > maxWidth && attribution.length > 0) {
       attribution = attribution.slice(0, -1);
     }
     attribution = `${attribution}${ellipsis}`;
@@ -330,9 +320,7 @@ export async function generateQuoteImage(
   );
 
   // ── Atribuição (calculada antes do texto para definir área disponível) ──
-  const attributionFontSize = Math.round(
-    CANVAS_SIZE * ATTRIBUTION_FONT_SIZE_RATIO,
-  );
+  const attributionFontSize = Math.round(CANVAS_SIZE * ATTRIBUTION_FONT_SIZE_RATIO);
   ctx.font = `600 ${attributionFontSize}px "Poppins"`;
   const contentWidth = CANVAS_SIZE - MARGIN_PX * 2;
   const attribution = buildAttribution(book, preferences, ctx, contentWidth);
@@ -365,8 +353,7 @@ export async function generateQuoteImage(
   const blockHeight = lines.length * lineHeight;
   // Centraliza verticalmente o bloco de texto na área disponível
   // + fontSize * 0.85 compensa a diferença entre baseline e centro visual
-  const startY =
-    textAreaTop + (textAreaHeight - blockHeight) / 2 + fontSize * 0.85;
+  const startY = textAreaTop + (textAreaHeight - blockHeight) / 2 + fontSize * 0.85;
   const centerX = CANVAS_SIZE / 2;
 
   for (let i = 0; i < lines.length; i++) {
@@ -386,9 +373,7 @@ export async function generateQuoteImage(
 
     // Letter-spacing manual: insere espaços finos entre caracteres
     // (canvas não suporta letter-spacing nativo)
-    const spaced = attribution
-      .split('')
-      .join('\u2009'); // thin space entre cada caractere
+    const spaced = attribution.split('').join('\u2009'); // thin space entre cada caractere
     ctx.fillText(spaced, centerX, CANVAS_SIZE * ATTRIBUTION_Y_RATIO);
   }
 
