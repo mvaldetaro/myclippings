@@ -5,13 +5,20 @@
 FROM node:22.22.2-slim AS build
 
 # Instala ferramentas necessárias para compilar módulos nativos
-# (argon2, better-sqlite3, sharp requerem python3, make, g++)
+# (argon2, better-sqlite3 requerem python3, make, g++)
+# canvas requer libcairo2-dev, libpango1.0-dev, libjpeg-dev, libgif-dev, librsvg2-dev
+# para fallback-to-build caso binário pré-compilado não esteja disponível
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
     ca-certificates \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Configura pnpm via corepack (versão fixa do projeto)
@@ -56,11 +63,17 @@ RUN pnpm --filter @my-clippings/api deploy /prod --legacy
 # ── Stage 2: Produção ────────────────────────────────────────────────────────
 FROM node:22.22.2-slim AS production
 
-# Ferramentas mínimas: curl para health check
+# Ferramentas mínimas: curl para health check + libs runtime do canvas
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgif7 \
+    libjpeg62-turbo \
+    librsvg2-2 \
   && rm -rf /var/lib/apt/lists/*
 
 # ── Cria usuário não-root para execução ──

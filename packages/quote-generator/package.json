@@ -14,9 +14,10 @@
   "dependencies": {
     "@my-clippings/domain": "workspace:*",
     "@my-clippings/schemas": "workspace:*",
-    "sharp": "^0.33.5"
+    "canvas": "^2.11.2"
   },
   "devDependencies": {
-    "@types/node": "^22.18.12"
+    "@types/node": "^22.18.12",
+    "sharp": "^0.33.5"
   }
 }
