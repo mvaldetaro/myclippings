@@ -1,6 +1,6 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import { Download, Palette } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { ErrorState } from '../../components/ErrorState';
@@ -9,10 +9,34 @@ import { PageSpinner } from '../../components/LoadingState';
 import { useBook } from '../../queries/books';
 import { useClipping } from '../../queries/clippings';
 import { downloadQuoteImage, getQuoteImageUrl } from '../../queries/quotes';
+import { useSettings } from '../../queries/settings';
 
 export const Route = createFileRoute('/quotes/$bookId/$clipId')({
   component: QuotePage,
 });
+
+const APP_DEFAULTS = {
+  backgroundColor: '#00635D',
+  textColor: '#FFFFFF',
+  showAuthor: true,
+  showBookTitle: true,
+} as const;
+
+const DEBOUNCE_MS = 350;
+
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => setDebounced(value), delay);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [value, delay]);
+
+  return debounced;
+}
 
 function QuotePage() {
   const params = useParams({ from: '/quotes/$bookId/$clipId' });
@@ -21,13 +45,32 @@ function QuotePage() {
 
   const { data: bookData, isLoading: bookLoading } = useBook(bookId);
   const { data: clipping, isLoading: clipLoading } = useClipping(bookId, clipId);
+  const { data: settings } = useSettings();
 
-  // Configurações locais de preview (a imagem é gerada server-side com
-  // as preferências salvas do usuário; aqui só controlamos a visualização)
-  const [backgroundColor, setBackgroundColor] = useState('#00635D');
-  const [textColor, setTextColor] = useState('#FFFFFF');
-  const [showAuthor, setShowAuthor] = useState(true);
-  const [showBookTitle, setShowBookTitle] = useState(true);
+  const [backgroundColor, setBackgroundColor] = useState(APP_DEFAULTS.backgroundColor);
+  const [textColor, setTextColor] = useState(APP_DEFAULTS.textColor);
+  const [showAuthor, setShowAuthor] = useState(APP_DEFAULTS.showAuthor);
+  const [showBookTitle, setShowBookTitle] = useState(APP_DEFAULTS.showBookTitle);
+
+  useEffect(() => {
+    if (settings) {
+      setBackgroundColor(settings.quotePreferences.backgroundColor);
+      setTextColor(settings.quotePreferences.textColor);
+      setShowAuthor(settings.quotePreferences.showAuthor);
+      setShowBookTitle(settings.quotePreferences.showBookTitle);
+    }
+  }, [settings]);
+
+  const overrides = useMemo(() => {
+    const result: Partial<typeof APP_DEFAULTS> = {};
+    if (backgroundColor !== APP_DEFAULTS.backgroundColor) result.backgroundColor = backgroundColor;
+    if (textColor !== APP_DEFAULTS.textColor) result.textColor = textColor;
+    if (showAuthor !== APP_DEFAULTS.showAuthor) result.showAuthor = showAuthor;
+    if (showBookTitle !== APP_DEFAULTS.showBookTitle) result.showBookTitle = showBookTitle;
+    return Object.keys(result).length > 0 ? result : undefined;
+  }, [backgroundColor, textColor, showAuthor, showBookTitle]);
+
+  const debouncedOverrides = useDebouncedValue(overrides, DEBOUNCE_MS);
 
   const isLoading = bookLoading || clipLoading;
 
@@ -42,7 +85,7 @@ function QuotePage() {
     );
   }
 
-  const imageUrl = getQuoteImageUrl(bookId, clipId);
+  const imageUrl = getQuoteImageUrl(bookId, clipId, debouncedOverrides);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -73,7 +116,7 @@ function QuotePage() {
             <Button
               variant="primary"
               className="w-full"
-              onClick={() => downloadQuoteImage(bookId, clipId)}
+              onClick={() => downloadQuoteImage(bookId, clipId, overrides)}
             >
               <Download className="h-4 w-4" />
               Baixar imagem (PNG)
@@ -90,7 +133,7 @@ function QuotePage() {
             </h2>
 
             <p className="body-sm text-muted mb-4">
-              Estas são suas preferências visuais salvas. Altere-as em Configurações.
+              Ajuste as cores e visibilidade. As alterações são aplicadas em tempo real.
             </p>
 
             <div className="flex flex-col gap-4">

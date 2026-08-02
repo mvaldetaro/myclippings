@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Layout, Palette } from 'lucide-react';
+import { Layout, Palette, RotateCcw } from 'lucide-react';
 import { type FormEvent, useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -16,11 +16,18 @@ function SettingsPage() {
   const { data, isLoading, isError, refetch } = useSettings();
   const updateSettings = useUpdateSettings();
 
+  const APP_DEFAULTS = {
+    backgroundColor: '#00635D',
+    textColor: '#FFFFFF',
+    showAuthor: true,
+    showBookTitle: true,
+  } as const;
+
   // Preferências de citação
-  const [backgroundColor, setBackgroundColor] = useState('#00635D');
-  const [textColor, setTextColor] = useState('#FFFFFF');
-  const [showAuthor, setShowAuthor] = useState(true);
-  const [showBookTitle, setShowBookTitle] = useState(true);
+  const [backgroundColor, setBackgroundColor] = useState(APP_DEFAULTS.backgroundColor);
+  const [textColor, setTextColor] = useState(APP_DEFAULTS.textColor);
+  const [showAuthor, setShowAuthor] = useState(APP_DEFAULTS.showAuthor);
+  const [showBookTitle, setShowBookTitle] = useState(APP_DEFAULTS.showBookTitle);
 
   // Sincroniza com dados do servidor
   useEffect(() => {
@@ -45,6 +52,23 @@ function SettingsPage() {
           showBookTitle,
         },
       },
+      {
+        onSuccess: () => {
+          setSaved(true);
+          setTimeout(() => setSaved(false), 3000);
+        },
+      },
+    );
+  };
+
+  const handleResetDefaults = () => {
+    setBackgroundColor(APP_DEFAULTS.backgroundColor);
+    setTextColor(APP_DEFAULTS.textColor);
+    setShowAuthor(APP_DEFAULTS.showAuthor);
+    setShowBookTitle(APP_DEFAULTS.showBookTitle);
+
+    updateSettings.mutate(
+      { quotePreferences: { ...APP_DEFAULTS } },
       {
         onSuccess: () => {
           setSaved(true);
@@ -160,6 +184,15 @@ function SettingsPage() {
           <div className="flex items-center gap-3 mt-2">
             <Button type="submit" variant="primary" loading={updateSettings.isPending}>
               Salvar preferências
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleResetDefaults}
+              loading={updateSettings.isPending}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Redefinir para padrões
             </Button>
             {saved && <span className="body-sm text-primary">Salvo com sucesso!</span>}
           </div>

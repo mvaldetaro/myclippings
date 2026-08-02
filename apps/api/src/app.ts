@@ -35,6 +35,7 @@ export async function createApp(options: AppOptions = {}) {
   await registerBookRoutes(app);
   await registerClippingRoutes(app);
   await registerQuoteRoutes(app);
+  await registerSettingsRoutes(app);
 
   return app;
 }
@@ -69,4 +70,9 @@ async function registerClippingRoutes(app: FastifyInstance) {
 async function registerQuoteRoutes(app: FastifyInstance) {
   const { quoteRoutes } = await import('./modules/quotes/routes');
   await app.register(quoteRoutes, { prefix: '/api/quotes' });
+}
+
+async function registerSettingsRoutes(app: FastifyInstance) {
+  const { settingsRoutes } = await import('./modules/settings/routes');
+  await app.register(settingsRoutes, { prefix: '/api/settings' });
 }
