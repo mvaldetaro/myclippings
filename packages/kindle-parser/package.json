@@ -1,0 +1,21 @@
+{
+  "name": "@my-clippings/kindle-parser",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@my-clippings/schemas": "workspace:*",
+    "ulid": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.12"
+  }
+}

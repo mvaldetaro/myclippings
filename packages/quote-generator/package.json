@@ -1,0 +1,22 @@
+{
+  "name": "@my-clippings/quote-generator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@my-clippings/domain": "workspace:*",
+    "@my-clippings/schemas": "workspace:*",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.12"
+  }
+}

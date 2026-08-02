@@ -1,0 +1,1 @@
+export { generateQuoteImage } from './renderer';

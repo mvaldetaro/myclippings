@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // ── Modo estrito ──
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+
+    // ── Módulos e resolução ──
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    // ── Emissão ──
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+
+    // ── Consistência ──
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "useUnknownInCatchVariables": true
+  },
+  "exclude": ["node_modules", "dist", "build", ".output", "coverage", "tests/e2e"]
+}

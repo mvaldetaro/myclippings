@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.output/
+.next/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.db-journal
+*.db-wal
+
+# Data (local development)
+data/database/
+data/users/
+
+# Temporary files
+*.tmp
+*.tmp.*
+
+# Coverage
+coverage/
+
+# Logs
+logs/
+*.log
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test artifacts
+test-results/
+playwright-report/

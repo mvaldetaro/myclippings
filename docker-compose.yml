@@ -1,0 +1,87 @@
+# ── My Clippings - Docker Compose ───────────────────────────────────────────
+# Orquestra API + Web com volumes persistentes para dados.
+#
+# Uso:
+#   docker compose up -d       # Inicia os serviços
+#   docker compose down        # Para os serviços (volumes são preservados)
+#   docker compose down -v     # Remove volumes (DESTRUTIVO: apaga todos os dados)
+#
+# Volumes persistentes (SPEC §13, ARCHITECTURE §6.4):
+#   database-data  → /data/database  (arquivo SQLite)
+#   user-files     → /data/users     (arquivos Markdown dos usuários)
+
+services:
+  # ── API HTTP (Fastify) ──────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: myclippings-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3001}:3000"
+    environment:
+      # ── Servidor ──
+      API_PORT: "3000"
+      API_HOST: "0.0.0.0"
+      NODE_ENV: "production"
+      # ── Banco de Dados ──
+      DATABASE_URL: "/app/data/database/my-clippings.db"
+      # ── JWT ──
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-24h}"
+      # ── Diretórios ──
+      DATA_DIR: "/app/data"
+      USER_FILES_DIR: "/app/data/users"
+      # ── Upload ──
+      MAX_UPLOAD_SIZE: "${MAX_UPLOAD_SIZE:-52428800}"
+      # ── Rate Limiting ──
+      RATE_LIMIT_MAX: "${RATE_LIMIT_MAX:-100}"
+      RATE_LIMIT_WINDOW_MS: "${RATE_LIMIT_WINDOW_MS:-60000}"
+      # ── Logging ──
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      # ── CORS ──
+      WEB_APP_URL: "${WEB_APP_URL:-http://localhost:3000}"
+    volumes:
+      # Volume persistente para o banco SQLite
+      - database-data:/app/data/database
+      # Volume persistente para os arquivos Markdown dos usuários
+      - user-files:/app/data/users
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Frontend Web (Nginx + Vite SPA) ─────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: myclippings-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:80"
+    environment:
+      # O nginx faz proxy para o serviço "api" (nome do container na rede interna)
+      # As variáveis abaixo são informativas; o proxy usa o hostname "api" fixo.
+      API_URL: "http://api:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+# ── Volumes Persistentes ──────────────────────────────────────────────────
+# Sobrevivem à remoção/recriação dos containers (SPEC §13).
+
+volumes:
+  database-data:
+    name: myclippings-database-data
+  user-files:
+    name: myclippings-user-files

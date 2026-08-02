@@ -1,0 +1,59 @@
+# ── .dockerignore ────────────────────────────────────────────────────────────
+# Exclui do contexto de build Docker arquivos desnecessários,
+# acelerando o build e reduzindo o tamanho da imagem.
+
+# Dependências
+node_modules/
+
+# Build outputs (serão gerados dentro do container)
+dist/
+.output/
+.next/
+
+# Ambiente de desenvolvimento
+.env
+.env.local
+.env.*.local
+
+# Testes
+**/tests/
+**/coverage/
+**/__tests__/
+
+# Documentação
+docs/
+*.md
+!README.md
+
+# Ferramentas
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Dados locais (volumes Docker substituem em produção)
+data/
+
+# Logs
+*.log
+logs/
+
+# Scripts operacionais
+scripts/
+
+# Configurações de CI
+.cursor/
+.codegraph/
+.omo/
+.planning/
+
+# Extras
+.agent/
+*.tgz
