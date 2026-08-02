@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // ─── users ───────────────────────────────────────────────────────────────────
 
@@ -59,6 +59,26 @@ export const userSettings = sqliteTable('user_settings', {
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
 });
+
+// ─── clipping_favorites ──────────────────────────────────────────────────────
+
+/** Favoritos de clippings — metadados operacionais (não armazena conteúdo do clipping). */
+export const clippingFavorites = sqliteTable(
+  'clipping_favorites',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    clippingId: text('clipping_id').notNull(), // fingerprint SHA-256 do Markdown
+    bookId: text('book_id').notNull(),
+    favoritedAt: text('favorited_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString()),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.clippingId] }),
+  }),
+);
 
 // ─── file_index ──────────────────────────────────────────────────────────────
 

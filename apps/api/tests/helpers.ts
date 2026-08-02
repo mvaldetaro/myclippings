@@ -105,7 +105,7 @@ export async function registerAndLogin(
   // Registra
   const registerRes = await app.inject({
     method: 'POST',
-    url: '/auth/register',
+    url: '/api/auth/register',
     payload: { name, email, password },
   });
 
@@ -115,7 +115,7 @@ export async function registerAndLogin(
   // Login
   const loginRes = await app.inject({
     method: 'POST',
-    url: '/auth/login',
+    url: '/api/auth/login',
     payload: { email, password },
   });
 

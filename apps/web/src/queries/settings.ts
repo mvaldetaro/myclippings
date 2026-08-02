@@ -12,7 +12,7 @@ export interface UserSettingsResponse {
 export function useSettings() {
   return useQuery<UserSettingsResponse>({
     queryKey: ['settings'],
-    queryFn: () => get<UserSettingsResponse>('/settings'),
+    queryFn: () => get<UserSettingsResponse>('/api/settings'),
   });
 }
 
@@ -24,7 +24,7 @@ export function useUpdateSettings() {
     mutationFn: (data: {
       quotePreferences?: Partial<QuotePreferences>;
       interfacePreferences?: Partial<InterfacePreferences>;
-    }) => post<UserSettingsResponse>('/settings', data),
+    }) => post<UserSettingsResponse>('/api/settings', data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['settings'] });
     },

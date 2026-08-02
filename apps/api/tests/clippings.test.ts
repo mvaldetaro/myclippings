@@ -17,7 +17,7 @@ describe('Clippings Routes', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: '/clippings/some-book-id',
+      url: '/api/clippings/some-book-id',
     });
 
     expect(res.statusCode).toBe(401);
@@ -37,7 +37,7 @@ describe('Clippings Routes', () => {
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -47,7 +47,7 @@ describe('Clippings Routes', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}`,
+      url: `/api/clippings/${bookId}`,
       cookies: { token },
     });
 
@@ -81,7 +81,7 @@ Note content.
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -92,7 +92,7 @@ Note content.
     // Filtra por nota
     const res = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}?type=nota`,
+      url: `/api/clippings/${bookId}?type=nota`,
       cookies: { token },
     });
 
@@ -125,7 +125,7 @@ Something completely different.
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -136,7 +136,7 @@ Something completely different.
     // Busca por "fox"
     const res = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}?text=fox`,
+      url: `/api/clippings/${bookId}?text=fox`,
       cookies: { token },
     });
 
@@ -159,7 +159,7 @@ Something completely different.
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -170,7 +170,7 @@ Something completely different.
     // Pega os clippings primeiro para obter o ID
     const listRes = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}`,
+      url: `/api/clippings/${bookId}`,
       cookies: { token },
     });
 
@@ -178,7 +178,7 @@ Something completely different.
 
     const res = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}/${clipId}`,
+      url: `/api/clippings/${bookId}/${clipId}`,
       cookies: { token },
     });
 
@@ -204,7 +204,7 @@ Something completely different.
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token: tokenA },
@@ -220,7 +220,7 @@ Something completely different.
 
     const res = await app.inject({
       method: 'GET',
-      url: `/clippings/${bookId}`,
+      url: `/api/clippings/${bookId}`,
       cookies: { token: tokenB },
     });
 

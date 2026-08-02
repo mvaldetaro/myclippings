@@ -11,6 +11,7 @@ import { Route as ImportRoute } from "./routes/import";
 import { Route as SettingsRoute } from "./routes/settings";
 import { Route as BooksIndexRoute } from "./routes/books/index";
 import { Route as BooksBookIdRoute } from "./routes/books/$bookId";
+import { Route as FavoritesIndexRoute } from "./routes/favorites/index";
 import { Route as QuotesClipRoute } from "./routes/quotes/$bookId.$clipId";
 
 /**
@@ -25,6 +26,7 @@ ImportRoute.update({ path: "/import" });
 SettingsRoute.update({ path: "/settings" });
 BooksIndexRoute.update({ path: "/books" });
 BooksBookIdRoute.update({ path: "/books/$bookId" });
+FavoritesIndexRoute.update({ path: "/favorites" });
 QuotesClipRoute.update({ path: "/quotes/$bookId/$clipId" });
 
 // Define getParentRoute para todas as rotas filhas
@@ -36,6 +38,7 @@ ImportRoute.options.getParentRoute = getRoot;
 SettingsRoute.options.getParentRoute = getRoot;
 BooksIndexRoute.options.getParentRoute = getRoot;
 BooksBookIdRoute.options.getParentRoute = getRoot;
+FavoritesIndexRoute.options.getParentRoute = getRoot;
 QuotesClipRoute.options.getParentRoute = getRoot;
 
 declare module "@tanstack/react-router" {
@@ -89,6 +92,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof BooksBookIdRoute;
       parentRoute: typeof rootRoute;
     };
+    "/favorites/": {
+      id: "/favorites/";
+      path: "/favorites";
+      fullPath: "/favorites";
+      preLoaderRoute: typeof FavoritesIndexRoute;
+      parentRoute: typeof rootRoute;
+    };
     "/quotes/$bookId/$clipId": {
       id: "/quotes/$bookId/$clipId";
       path: "/quotes/$bookId/$clipId";
@@ -107,5 +117,6 @@ export const routeTree = rootRoute.addChildren({
   SettingsRoute,
   BooksIndexRoute,
   BooksBookIdRoute,
+  FavoritesIndexRoute,
   QuotesClipRoute,
 });

@@ -24,17 +24,18 @@ export class ApiError extends Error {
  * Em caso de 401, redireciona para /login (exceto em rotas de auth).
  */
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const hasBody = options.body !== undefined && options.body !== null;
   const res = await fetch(url, {
     ...options,
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       ...options.headers,
     },
   });
 
   // Redireciona para login em caso de 401 (não em rotas de auth)
-  if (res.status === 401 && !url.startsWith('/auth')) {
+  if (res.status === 401 && !url.startsWith('/api/auth')) {
     // Só redireciona no cliente
     if (typeof window !== 'undefined') {
       // Evita loop infinito: não redireciona se já está em /login ou /register
@@ -109,6 +110,14 @@ export async function getText(url: string): Promise<string> {
 export async function post<T>(url: string, body?: unknown): Promise<T> {
   return request<T>(url, {
     method: 'POST',
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}
+
+/** PATCH request com body JSON */
+export async function patch<T>(url: string, body?: unknown): Promise<T> {
+  return request<T>(url, {
+    method: 'PATCH',
     body: body ? JSON.stringify(body) : undefined,
   });
 }

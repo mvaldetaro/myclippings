@@ -40,7 +40,7 @@ describe('Import Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
     });
 
     expect(res.statusCode).toBe(401);
@@ -55,7 +55,7 @@ describe('Import Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       cookies: { token },
     });
 
@@ -81,7 +81,7 @@ describe('Import Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: {
         'content-type': `multipart/form-data; boundary=${boundary}`,
       },
@@ -116,7 +116,7 @@ describe('Import Routes', () => {
     // Primeira importação
     const res1 = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -128,7 +128,7 @@ describe('Import Routes', () => {
     // Segunda importação (mesmo arquivo)
     const res2 = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -164,7 +164,7 @@ describe('Import Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -174,5 +174,85 @@ describe('Import Routes', () => {
     const result = res.json();
     expect(result.importedRecords).toBe(2);
     expect(result.updatedBooks).toHaveLength(2);
+  });
+
+  it('POST /imports deduplicates fragmented notes (Kindle typing bug)', async () => {
+    const testCtx = await createTestApp();
+    app = testCtx.app;
+    cleanup = testCtx.cleanup;
+
+    const { token } = await registerAndLogin(app);
+
+    // Simula o bug: fragmentos progressivos de uma nota sendo digitada,
+    // todos com mesma página/posição e timestamps ~2s de diferença
+    const noteFragments = [
+      makeClipping({
+        title: 'Clean Code',
+        author: 'Robert C. Martin',
+        type: 'Nota',
+        content: 'Esss td',
+        page: '72',
+        location: '739',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:11:50',
+      }),
+      makeClipping({
+        title: 'Clean Code',
+        author: 'Robert C. Martin',
+        type: 'Nota',
+        content: 'Esss trecho',
+        page: '72',
+        location: '739',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:11:58',
+      }),
+      makeClipping({
+        title: 'Clean Code',
+        author: 'Robert C. Martin',
+        type: 'Nota',
+        content: 'Esss trecho combina com o senso de comunidade',
+        page: '72',
+        location: '739',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:12:18',
+      }),
+      makeClipping({
+        title: 'Clean Code',
+        author: 'Robert C. Martin',
+        type: 'Nota',
+        content: 'Esss trecho combina com o senso de comunidade ditado por Adler',
+        page: '72',
+        location: '739',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:12:28',
+      }),
+    ];
+
+    // Adiciona um destaque legítimo (mesmo livro, posição diferente)
+    const highlight = makeClipping({
+      title: 'Clean Code',
+      author: 'Robert C. Martin',
+      type: 'Destaque',
+      content: 'The only way to go fast is to go well.',
+      page: '74',
+      location: '772-773',
+      date: 'sexta-feira, 2 de janeiro de 2026 19:07:11',
+    });
+
+    const fileContent = generateClippingsFile([...noteFragments, highlight]);
+    const boundary = '---testboundary';
+    const body = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="My Clippings.txt"\r\nContent-Type: text/plain\r\n\r\n${fileContent.toString('utf-8')}\r\n--${boundary}--`;
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/imports',
+      headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
+      body,
+      cookies: { token },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const result = res.json();
+    expect(result.status).toBe('completed');
+    // Apenas 2 registros: 1 nota (mais recente/completa) + 1 destaque
+    expect(result.importedRecords).toBe(2);
+    // Os outros 3 fragmentos devem ser contados como duplicados
+    expect(result.duplicateRecords).toBe(3);
   });
 });

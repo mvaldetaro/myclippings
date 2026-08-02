@@ -15,7 +15,7 @@ describe('Books Routes', () => {
     app = testCtx.app;
     cleanup = testCtx.cleanup;
 
-    const res = await app.inject({ method: 'GET', url: '/books' });
+    const res = await app.inject({ method: 'GET', url: '/api/books' });
     expect(res.statusCode).toBe(401);
   });
 
@@ -28,7 +28,7 @@ describe('Books Routes', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: '/books',
+      url: '/api/books',
       cookies: { token },
     });
 
@@ -50,7 +50,7 @@ describe('Books Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -58,7 +58,7 @@ describe('Books Routes', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: '/books',
+      url: '/api/books',
       cookies: { token },
     });
 
@@ -84,7 +84,7 @@ describe('Books Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary1}` },
       body: b1,
       cookies: { token },
@@ -96,7 +96,7 @@ describe('Books Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary2}` },
       body: b2,
       cookies: { token },
@@ -105,7 +105,7 @@ describe('Books Routes', () => {
     // Busca por "Alpha"
     const res = await app.inject({
       method: 'GET',
-      url: '/books?search=Alpha',
+      url: '/api/books?search=Alpha',
       cookies: { token },
     });
 
@@ -129,7 +129,7 @@ describe('Books Routes', () => {
 
     const importRes = await app.inject({
       method: 'POST',
-      url: '/imports',
+      url: '/api/imports',
       headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
       body,
       cookies: { token },
@@ -139,7 +139,7 @@ describe('Books Routes', () => {
 
     const res = await app.inject({
       method: 'GET',
-      url: `/books/${bookId}/download`,
+      url: `/api/books/${bookId}/download`,
       cookies: { token },
     });
 

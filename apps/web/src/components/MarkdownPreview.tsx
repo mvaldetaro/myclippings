@@ -1,5 +1,5 @@
-import { AlertTriangle, Loader2, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { AlertTriangle, Code, Eye, Loader2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from './Button';
@@ -24,6 +24,9 @@ export function MarkdownPreview({
   onClose,
   onRetry,
 }: MarkdownPreviewProps) {
+  // Controle de visualização: renderizado (ReactMarkdown) vs. conteúdo original (raw)
+  const [rawMode, setRawMode] = useState(false);
+
   // Bloqueia scroll do body enquanto o modal está aberto
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -45,10 +48,22 @@ export function MarkdownPreview({
       <div className="bg-surface rounded-lg border border-neutral w-full max-w-3xl max-h-[90vh] flex flex-col shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral">
-          <h2 className="headline-md text-text">Visualização Markdown</h2>
-          <Button variant="tertiary" size="sm" onClick={onClose} aria-label="Fechar visualização">
-            <X className="h-5 w-5" />
-          </Button>
+          <h2 className="headline-md text-text">
+            {rawMode ? 'Conteúdo Original' : 'Visualização Markdown'}
+          </h2>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => setRawMode((prev) => !prev)}
+              aria-label={rawMode ? 'Ver renderizado' : 'Ver conteúdo original'}
+            >
+              {rawMode ? <Eye className="h-5 w-5" /> : <Code className="h-5 w-5" />}
+            </Button>
+            <Button variant="tertiary" size="sm" onClick={onClose} aria-label="Fechar visualização">
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Conteúdo */}
@@ -70,10 +85,16 @@ export function MarkdownPreview({
             </div>
           )}
 
-          {!loading && !error && content && (
+          {!loading && !error && content && !rawMode && (
             <div className="prose prose-sm max-w-none text-on-surface">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
             </div>
+          )}
+
+          {!loading && !error && content && rawMode && (
+            <pre className="body-sm text-on-surface whitespace-pre-wrap font-mono break-words">
+              {content}
+            </pre>
           )}
         </div>
 

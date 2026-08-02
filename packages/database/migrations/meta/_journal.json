@@ -8,6 +8,20 @@
       "when": 1785004738086,
       "tag": "0000_fast_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785678758127,
+      "tag": "0001_exotic_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785679228569,
+      "tag": "0002_dizzy_shriek",
+      "breakpoints": true
     }
   ]
 }

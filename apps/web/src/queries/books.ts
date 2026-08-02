@@ -39,7 +39,7 @@ export function useBooks(search?: string) {
     queryKey: ['books', { search }],
     queryFn: () => {
       const params = search ? `?search=${encodeURIComponent(search)}` : '';
-      return get<{ books: BookListItem[] }>(`/books${params}`);
+      return get<{ books: BookListItem[] }>(`/api/books${params}`);
     },
   });
 }
@@ -48,7 +48,7 @@ export function useBooks(search?: string) {
 export function useBook(bookId: string) {
   return useQuery<BookWithClippingsResponse>({
     queryKey: ['books', bookId],
-    queryFn: () => get<BookWithClippingsResponse>(`/books/${bookId}`),
+    queryFn: () => get<BookWithClippingsResponse>(`/api/books/${bookId}`),
     enabled: !!bookId,
   });
 }
@@ -57,7 +57,7 @@ export function useBook(bookId: string) {
 export function useDownloadBook() {
   return {
     download: async (bookId: string, title: string) => {
-      const blob = await get<Blob>(`/books/${bookId}/download`);
+      const blob = await get<Blob>(`/api/books/${bookId}/download`);
       triggerDownload(blob, `${title}.md`);
     },
   };
@@ -67,7 +67,7 @@ export function useDownloadBook() {
 export function useMarkdownContent(bookId: string) {
   return useQuery<string>({
     queryKey: ['books', bookId, 'markdown'],
-    queryFn: () => getText(`/books/${bookId}/markdown`),
+    queryFn: () => getText(`/api/books/${bookId}/markdown`),
     enabled: false, // só busca sob demanda (abertura do modal)
   });
 }

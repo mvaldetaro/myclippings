@@ -15,7 +15,7 @@ describe('Health Routes', () => {
     app = testCtx.app;
     cleanup = testCtx.cleanup;
 
-    const res = await app.inject({ method: 'GET', url: '/health' });
+    const res = await app.inject({ method: 'GET', url: '/api/health' });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ status: 'ok' });
   });
@@ -25,7 +25,7 @@ describe('Health Routes', () => {
     app = testCtx.app;
     cleanup = testCtx.cleanup;
 
-    const res = await app.inject({ method: 'GET', url: '/health/ready' });
+    const res = await app.inject({ method: 'GET', url: '/api/health/ready' });
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.status).toBe('ready');
@@ -38,7 +38,7 @@ describe('Health Routes', () => {
     app = testCtx.app;
     cleanup = testCtx.cleanup;
 
-    const res = await app.inject({ method: 'GET', url: '/health' });
+    const res = await app.inject({ method: 'GET', url: '/api/health' });
     expect(res.headers['x-correlation-id']).toBeDefined();
   });
 });

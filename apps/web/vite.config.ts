@@ -8,27 +8,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/auth': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/books': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/imports': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/clippings': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/quotes': {
-        target: process.env.VITE_API_URL ?? 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/health': {
+      '/api': {
         target: process.env.VITE_API_URL ?? 'http://localhost:3001',
         changeOrigin: true,
       },

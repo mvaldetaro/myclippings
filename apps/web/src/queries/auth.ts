@@ -18,7 +18,7 @@ export function useCurrentUser() {
     queryKey: ['auth', 'me'],
     queryFn: async () => {
       try {
-        const res = await get<{ books: Array<{ id: string }> }>('/books');
+        const res = await get<{ books: Array<{ id: string }> }>('/api/books');
         if (res?.books) {
           return { id: 'authenticated', name: '', email: '' };
         }
@@ -40,7 +40,7 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: (data: { name: string; email: string; password: string }) =>
-      post<UserResponse>('/auth/register', data),
+      post<UserResponse>('/api/auth/register', data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['auth'] });
     },
@@ -53,7 +53,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (data: { email: string; password: string }) =>
-      post<UserResponse>('/auth/login', data),
+      post<UserResponse>('/api/auth/login', data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['auth'] });
     },
@@ -65,7 +65,7 @@ export function useLogout() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: () => post<{ message: string }>('/auth/logout'),
+    mutationFn: () => post<{ message: string }>('/api/auth/logout'),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['auth'] });
       qc.clear();

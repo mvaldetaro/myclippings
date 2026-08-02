@@ -1,4 +1,4 @@
-import { BookOpen, LogOut, Menu, Settings, Upload, X } from 'lucide-react';
+import { BookOpen, Heart, LogOut, Menu, Settings, Upload, X } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import { Button } from './Button';
 
@@ -20,6 +20,7 @@ export function Layout({ children, isAuthenticated, onLogout }: LayoutProps) {
 
   const authLinks: NavLink[] = [
     { label: 'Livros', href: '/books', icon: <BookOpen className="h-4 w-4" /> },
+    { label: 'Favoritos', href: '/favorites', icon: <Heart className="h-4 w-4" /> },
     { label: 'Importar', href: '/import', icon: <Upload className="h-4 w-4" /> },
     { label: 'Configurações', href: '/settings', icon: <Settings className="h-4 w-4" /> },
   ];

@@ -17,7 +17,7 @@ export function useImport() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => uploadFile<ImportResultResponse>('/imports', file),
+    mutationFn: (file: File) => uploadFile<ImportResultResponse>('/api/imports', file),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['books'] });
     },

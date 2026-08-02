@@ -1,5 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowUpDown, Copy, CopyCheck, Download, Eye, FileText, Image, Search } from 'lucide-react';
+import {
+  ArrowUpDown,
+  Copy,
+  CopyCheck,
+  Download,
+  Eye,
+  FileText,
+  Heart,
+  Image,
+  Search,
+} from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -10,8 +20,9 @@ import { PageSpinner } from '../../components/LoadingState';
 import { MarkdownPreview } from '../../components/MarkdownPreview';
 import { clippingTypeLabel, formatDate } from '../../lib/utils';
 import { useBook, useDownloadBook, useMarkdownContent } from '../../queries/books';
-import { type ClippingFilters, useClippings } from '../../queries/clippings';
+import { type ClippingFilters, useClippings, useFavoriteClippings } from '../../queries/clippings';
 import type { ClippingResponse } from '../../queries/clippings';
+import { useToggleFavorite } from '../../queries/clippings';
 
 export const Route = createFileRoute('/books/$bookId')({
   component: BookDetailPage,
@@ -31,6 +42,7 @@ function BookDetailPage() {
   const [textFilter, setTextFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'date-asc' | 'date-desc'>('date-desc');
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   const filters: ClippingFilters = useMemo(
     () => ({
@@ -40,8 +52,9 @@ function BookDetailPage() {
           ? undefined
           : (typeFilter as 'destaque' | 'nota' | 'marcador'),
       sort: sortOrder,
+      favorites: favoritesOnly || undefined,
     }),
-    [textFilter, typeFilter, sortOrder],
+    [textFilter, typeFilter, sortOrder, favoritesOnly],
   );
 
   const {
@@ -52,9 +65,12 @@ function BookDetailPage() {
   } = useClippings(bookId, filters);
 
   const { download } = useDownloadBook();
+  const toggleFavorite = useToggleFavorite();
+  const { data: favoritesData } = useFavoriteClippings(bookId);
   const [copiedAll, setCopiedAll] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedMdId, setCopiedMdId] = useState<string | null>(null);
+  const [togglingFavorite, setTogglingFavorite] = useState<string | null>(null);
   const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
 
   const {
@@ -66,6 +82,10 @@ function BookDetailPage() {
 
   const book = bookData?.book;
   const clippings = clippingsData?.clippings ?? [];
+  const favoritedIds = useMemo(
+    () => new Set((favoritesData?.favorites ?? []).map((f) => f.id)),
+    [favoritesData],
+  );
 
   // Copiar clipping individual
   const copyClipping = useCallback(async (id: string, content: string) => {
@@ -200,6 +220,17 @@ function BookDetailPage() {
             <ArrowUpDown className="h-4 w-4" />
             {sortOrder === 'date-desc' ? 'Mais recentes' : 'Mais antigos'}
           </Button>
+
+          <Button
+            variant={favoritesOnly ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setFavoritesOnly(!favoritesOnly)}
+            className="flex items-center gap-1.5"
+            aria-label={favoritesOnly ? 'Mostrar todos' : 'Mostrar apenas favoritos'}
+          >
+            <Heart className={`h-4 w-4 ${favoritesOnly ? 'fill-current' : ''}`} />
+            Favoritos
+          </Button>
         </div>
       </Card>
 
@@ -280,6 +311,29 @@ function BookDetailPage() {
                 >
                   <Image className="h-4 w-4" />
                   Gerar imagem
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setTogglingFavorite(clipping.id);
+                    toggleFavorite.mutate(
+                      { bookId, clipId: clipping.id },
+                      { onSettled: () => setTogglingFavorite(null) },
+                    );
+                  }}
+                  disabled={togglingFavorite === clipping.id}
+                  aria-label={
+                    favoritedIds.has(clipping.id) ? 'Remover favorito' : 'Adicionar favorito'
+                  }
+                  title={favoritedIds.has(clipping.id) ? 'Remover favorito' : 'Adicionar favorito'}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${
+                      favoritedIds.has(clipping.id) ? 'fill-red-500 text-red-500' : ''
+                    } ${togglingFavorite === clipping.id ? 'animate-pulse' : ''}`}
+                  />
                 </Button>
               </div>
             </Card>

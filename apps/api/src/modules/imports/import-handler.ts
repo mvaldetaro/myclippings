@@ -30,6 +30,60 @@ interface BookGroup {
 }
 
 /**
+ * Remove fragmentos de notas gerados pelo bug do Kindle.
+ *
+ * Quando o usuário digita uma nota no Kindle, cada tecla pressionada gera um
+ * novo registro no My Clippings.txt com conteúdo incremental e timestamps
+ * ~2s de diferença. Exemplo:
+ *
+ *   "Esss td"            (22:11:50)
+ *   "Esss trecho"        (22:11:58)
+ *   "Esss trecho comb..." (22:12:18)
+ *
+ * Todos com mesma página/localização. A deduplicação por fingerprint não
+ * resolve porque conteúdo e data são diferentes. Esta função agrupa notas
+ * por (página, localização) e mantém apenas a com kindleDate mais recente
+ * (que contém o texto completo da nota).
+ *
+ * Destaques e marcadores não são afetados — o bug só ocorre com notas.
+ */
+function deduplicateNoteFragments(
+  records: ReturnType<typeof toRawClipping>[],
+): { records: ReturnType<typeof toRawClipping>[]; removedCount: number } {
+  // Separa notas dos demais tipos (destaques e marcadores não são afetados)
+  const notes = records.filter((r) => r.type === 'nota');
+  const nonNotes = records.filter((r) => r.type !== 'nota');
+
+  if (notes.length <= 1) return { records, removedCount: 0 };
+
+  // Agrupa notas por chave (página, localização)
+  const groups = new Map<string, ReturnType<typeof toRawClipping>[]>();
+  for (const note of notes) {
+    const pageKey = note.page === null ? '' : String(note.page);
+    const key = `${pageKey}|${note.locationStart}`;
+    const existing = groups.get(key);
+    if (existing) {
+      existing.push(note);
+    } else {
+      groups.set(key, [note]);
+    }
+  }
+
+  // Para cada grupo, mantém apenas a nota com kindleDate mais recente
+  let removedCount = 0;
+  const deduped: ReturnType<typeof toRawClipping>[] = [];
+  for (const group of groups.values()) {
+    group.sort(
+      (a, b) => new Date(b.kindleDate).getTime() - new Date(a.kindleDate).getTime(),
+    );
+    deduped.push(group[0]!);
+    removedCount += group.length - 1;
+  }
+
+  return { records: [...nonNotes, ...deduped], removedCount };
+}
+
+/**
  * Handler de importação de arquivo My Clippings.txt (SPEC §4, ARCHITECTURE §4.2).
  *
  * Fluxo:
@@ -173,9 +227,12 @@ export async function importHandler(
 
       const existingFingerprints = new Set(existingClippings.map((c) => c.id));
 
-      // 7b. Computa fingerprints e descarta duplicados
+      // 7b. Remove fragmentos de notas (bug do Kindle) e computa fingerprints
+      const dedupResult = deduplicateNoteFragments(group.records);
+      duplicateRecords += dedupResult.removedCount;
+
       const newClippings: MarkdownClipping[] = [];
-      for (const raw of group.records) {
+      for (const raw of dedupResult.records) {
         const fingerprint = computeFingerprint({
           bookId,
           type: raw.type,

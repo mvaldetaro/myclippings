@@ -17,7 +17,7 @@ describe('Auth Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: 'Alice', email: 'alice@test.com', password: 'password123' },
     });
 
@@ -36,13 +36,13 @@ describe('Auth Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: 'Bob', email: 'bob@test.com', password: 'password123' },
     });
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: 'Bob 2', email: 'bob@test.com', password: 'password123' },
     });
 
@@ -56,7 +56,7 @@ describe('Auth Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: '', email: 'invalid', password: '123' },
     });
 
@@ -70,13 +70,13 @@ describe('Auth Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: 'Charlie', email: 'charlie@test.com', password: 'password123' },
     });
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/login',
+      url: '/api/auth/login',
       payload: { email: 'charlie@test.com', password: 'password123' },
     });
 
@@ -99,13 +99,13 @@ describe('Auth Routes', () => {
 
     await app.inject({
       method: 'POST',
-      url: '/auth/register',
+      url: '/api/auth/register',
       payload: { name: 'Dave', email: 'dave@test.com', password: 'password123' },
     });
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/login',
+      url: '/api/auth/login',
       payload: { email: 'dave@test.com', password: 'wrongpassword' },
     });
 
@@ -123,7 +123,7 @@ describe('Auth Routes', () => {
 
     const res = await app.inject({
       method: 'POST',
-      url: '/auth/logout',
+      url: '/api/auth/logout',
       cookies: { token },
     });
 
@@ -140,7 +140,7 @@ describe('Auth Routes', () => {
     app = testCtx.app;
     cleanup = testCtx.cleanup;
 
-    const res = await app.inject({ method: 'GET', url: '/books' });
+    const res = await app.inject({ method: 'GET', url: '/api/books' });
     expect(res.statusCode).toBe(401);
   });
 });

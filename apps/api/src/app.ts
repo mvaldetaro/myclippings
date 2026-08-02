@@ -43,30 +43,30 @@ export async function createApp(options: AppOptions = {}) {
 
 async function registerHealthRoutes(app: FastifyInstance) {
   const { healthRoutes } = await import('./routes/health');
-  await app.register(healthRoutes, { prefix: '/health' });
+  await app.register(healthRoutes, { prefix: '/api/health' });
 }
 
 async function registerAuthRoutes(app: FastifyInstance) {
   const { authRoutes } = await import('./modules/auth/routes');
-  await app.register(authRoutes, { prefix: '/auth' });
+  await app.register(authRoutes, { prefix: '/api/auth' });
 }
 
 async function registerImportRoutes(app: FastifyInstance) {
   const { importRoutes } = await import('./modules/imports/routes');
-  await app.register(importRoutes, { prefix: '/imports' });
+  await app.register(importRoutes, { prefix: '/api/imports' });
 }
 
 async function registerBookRoutes(app: FastifyInstance) {
   const { bookRoutes } = await import('./modules/books/routes');
-  await app.register(bookRoutes, { prefix: '/books' });
+  await app.register(bookRoutes, { prefix: '/api/books' });
 }
 
 async function registerClippingRoutes(app: FastifyInstance) {
   const { clippingRoutes } = await import('./modules/clippings/routes');
-  await app.register(clippingRoutes, { prefix: '/clippings' });
+  await app.register(clippingRoutes, { prefix: '/api/clippings' });
 }
 
 async function registerQuoteRoutes(app: FastifyInstance) {
   const { quoteRoutes } = await import('./modules/quotes/routes');
-  await app.register(quoteRoutes, { prefix: '/quotes' });
+  await app.register(quoteRoutes, { prefix: '/api/quotes' });
 }

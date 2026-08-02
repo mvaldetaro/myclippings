@@ -283,4 +283,55 @@ describe('parseClippingsFile', () => {
 
     expect(result.records[0]!.kindleDate).toContain('2024-03-15');
   });
+
+  // ── Notas fragmentadas (bug do Kindle: cada tecla gera um registro) ──────
+
+  it('deve extrair todos os fragmentos de uma nota digitada no Kindle (sem deduplicar)', () => {
+    // Simula o bug do Kindle: cada keystroke ao digitar uma nota
+    // gera um novo registro com o conteúdo incremental
+    const fragments = [
+      {
+        content: 'Esss td',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:11:50',
+      },
+      {
+        content: 'Esss trecho',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:11:58',
+      },
+      {
+        content: 'Esss trecho combina com o senso de comunidade',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:12:18',
+      },
+      {
+        content: 'Esss trecho combina com o senso de comunidade ditado por Adler',
+        date: 'quinta-feira, 1 de janeiro de 2026 22:12:24',
+      },
+    ];
+
+    const records = fragments.map(
+      (f) =>
+        `O Pequeno Manual Estoico (Salzgeber, Jonas)\n- Sua nota na página 72 | posição 739 | Adicionado: ${f.date}\n\n${f.content}`,
+    );
+
+    const fileContent = records.join('\n==========\n');
+    const result = parseClippingsFile(Buffer.from(fileContent, 'utf-8'));
+
+    // O parser NÃO deve deduplicar — extrai todos os registros fielmente
+    expect(result.records).toHaveLength(4);
+    expect(result.records[0]!.content).toBe('Esss td');
+    // Data local 22:11:50 BRT (UTC-3) → 01:11:50 UTC do dia seguinte
+    expect(result.records[0]!.kindleDate).toMatch(/2026-01-02T01:11:5\d/);
+    expect(result.records[3]!.content).toBe(
+      'Esss trecho combina com o senso de comunidade ditado por Adler',
+    );
+    // Data local 22:12:24 BRT (UTC-3) → 01:12:24 UTC do dia seguinte
+    expect(result.records[3]!.kindleDate).toMatch(/2026-01-02T01:12:2\d/);
+
+    // Todos os registros têm mesma página e localização
+    for (const r of result.records) {
+      expect(r!.page).toBe(72);
+      expect(r!.locationStart).toBe(739);
+      expect(r!.type).toBe('nota');
+    }
+  });
 });
