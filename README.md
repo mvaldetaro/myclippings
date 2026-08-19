@@ -307,4 +307,4 @@ Instruções completas em [`docs/BACKUP.md`](docs/BACKUP.md).
 
 ## Licença
 
-Projeto privado — versão 0.1.0 (MVP).
+MIT — versão 0.1.0 (MVP).
