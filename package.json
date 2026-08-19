@@ -1,7 +1,7 @@
 {
   "name": "my-clippings",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "Importe, organize e leia seus clippings do Kindle em Markdown",
   "packageManager": "pnpm@11.9.0",
   "engines": {
